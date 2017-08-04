@@ -34,7 +34,7 @@ if (input.files && input.files[0]) {
                var fd = new FormData();
                var xhr = new XMLHttpRequest();
                var up_progress = document.getElementById('up_progress');
-               xhr.open('POST', 'upload.php',true)
+               xhr.open('POST', '/upload.php',true)
               
               // xhr.upload.onprogress = function (evt) {
               
@@ -69,7 +69,7 @@ if (input.files && input.files[0]) {
                
                 reader.onload = (function(file){ 
                    return function(event){     
-                $("div[name='"+app_div+"']").append(load);
+                
                   var app_div="div_"+ file_array+"_"+file.name;
                   //var app_img="img_"+ file_array+"_"+file.name;
                    var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:5px; width:30px; height:30px; display:none">&nbsp;';
@@ -239,7 +239,7 @@ $(function () { //進去div後顯示右上角X
                     if (confirm("確定移除圖片?")) {
 //-------------------ajax開始-----------------------------------------                              
                     $.ajax({
-                      url: "delete.php",
+                      url: "/delete.php",
                       data: del_info,
                       type:"POST",
                       dataType:'text',
@@ -284,21 +284,21 @@ $(function () { //進去div後顯示右上角X
     </td>
     </tr>
     </table>
-    <table align="center" width="85%" bgcolor="#f3f3f3">
+   <!--  <table align="center" width="85%" bgcolor="#f3f3f3">
     <tr>
     <td align="center">
-        <img id="img_pre" src="/images/glyphicons-647-ambulance.png" onclick="img_file.click()"> <!-- 上傳圖片按鈕 -->
+        <img id="img_pre" src="/images/glyphicons-647-ambulance.png" onclick="img_file.click()"> 
         
         <div id="searchResult"></div>
 
     </td>
     
     </tr>
-    </table>
+    </table> -->
     <table align="center" width="85%" bgcolor="#f3f3f3">
     <tr>
     <td align="center">
-    <input type="submit" value="送出資料" >
+    <input type="submit" value="submit" >
     </td>
     </tr>
     </table>
