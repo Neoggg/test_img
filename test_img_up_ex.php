@@ -256,7 +256,13 @@ $(function () { //進去div後顯示右上角X
                   var div_name="div_"+this.id.substring(4)
                   $("div[name='"+div_name+"']").remove(); //抓div name刪除
                   //$(this).closest("div").remove()//抓最近的div刪除
-                
+                  var pre_sum= document.getElementsByClassName('pre_img').length
+                  //var add= document.getElementById('add_new')
+                  if(pre_sum<5&& $("#add_new").length==0){
+                    var add_new='<img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" />'
+                   $("#preview_img1").append(add_new)
+                  }
+
                   }     
                 }         
             
@@ -274,7 +280,7 @@ $(function () { //進去div後顯示右上角X
     <tr>
     <td align="center">
         <input type="file" name="img_file[]" id="img_file" size="20" onchange="readimg_multiple(this);" style="display: none;" accept="image/jpeg,image/gif,image/png" multiple>
-        <div id="preview_img1" ><!-- <img  id="add_new" src="/images/add_new.png"  width="200" height="150" style="display: none" /> --></div> <!-- 預覽圖片位置 -->
+        <div id="preview_img1" ><img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" /></div> <!-- 預覽圖片位置 -->
     </td>
     </tr>
     </table>
