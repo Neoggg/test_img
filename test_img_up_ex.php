@@ -55,7 +55,7 @@ if (input.files && input.files[0]) {
 
               for($i=0;$i<filelist.length;$i++){    
                 
-                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:4;"></div>'; //先生成預覽圖所需要div
+                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="  padding-right:10px;  display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; width:100%  height:100% top:0; right:10;"></div>'; //先生成預覽圖所需要div 留了10px空白 loading del要right 10px
                 $('#preview_img1').append(div_str);
                 
                 var file= filelist[$i]                             
@@ -72,7 +72,7 @@ if (input.files && input.files[0]) {
                 
                   var app_div="div_"+ file_array+"_"+file.name;
                   //var app_img="img_"+ file_array+"_"+file.name;
-                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:5px; width:30px; height:30px; display:none">&nbsp;';
+                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none">';
                    //var img_del_str='<img  src="/images/del_pre.png" style="position : absolute;top : 0px;right : 0px;width : 20px;height : 20px;">'
                    //$('#preview_img1').append(img_str);
                    $("div[name='"+app_div+"']").append(img_str);
@@ -119,7 +119,7 @@ if (input.files && input.files[0]) {
                 //     document.getElementById('preview_img1').appendChild(imgx);   
                 //     xhr.send(fd);
                 // }
-                var time_num = get_date_num();                
+                               
                 fd.append('img_file[]', filelist[$i],file_array+"_"+filelist[$i].name); 
 
                 xhr.onreadystatechange = function() {
@@ -142,15 +142,7 @@ if (input.files && input.files[0]) {
         }
     var file_clear = document.getElementById(input.id); //假如上傳跟前一個一樣的會無法更新 所以要清空
     file_clear.outerHTML=file_clear.outerHTML
-}
-
-function openfile(evt) {
-            var img = evt.target.result;
-            var imgx = document.createElement('img');
-            imgx.style.margin = "10px";
-            imgx.src = img;
-            document.getElementById('preview_img1').appendChild(imgx);
-        }  
+}  
 
 function get_date_num(){
      var now=new Date()
@@ -170,21 +162,6 @@ function get_date_num(){
                 return time_num
 }
 
-function clear_img_multiple(clear){
-  //document.getElementById("form_test").reset() //全部重設
-  // alert(file.outerHTML) //return false;
-  var num=1;
-  var file=document.getElementById('img_file');
-
-  for($i=0;$i<file.files.length;$i++){
-     $('#preview_img'+num).attr('src','');//預覽圖置空
-     document.getElementById('msg_name'+num).innerHTML='請選擇圖片';//圖片info 回預設值
-     document.getElementById('msg_wh'+num).innerHTML='';
-     num++;
-  }
-  file.outerHTML=file.outerHTML;//預設的HTML蓋掉更新後的
-   
-}
 </script>
 <script type="text/javascript">
 
@@ -284,20 +261,11 @@ $(function () { //進去div後顯示右上角X
     </td>
     </tr>
     </table>
-   <!--  <table align="center" width="85%" bgcolor="#f3f3f3">
-    <tr>
-    <td align="center">
-        <img id="img_pre" src="/images/glyphicons-647-ambulance.png" onclick="img_file.click()"> 
-        
-        <div id="searchResult"></div>
-
-    </td>
-    
-    </tr>
-    </table> -->
+  
     <table align="center" width="85%" bgcolor="#f3f3f3">
-    <tr>
+    <tr>    
     <td align="center">
+    <div id="searchResult"></div>
     <input type="submit" value="submit" >
     </td>
     </tr>
