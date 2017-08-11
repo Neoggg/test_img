@@ -2,6 +2,7 @@
 print_r($_POST);
 echo "<br>";
 $time=date("Y-m-d H:i:s");
+//----------------------直播達人 資料設定--------------------------------------------------------
 $live_data=array();
 $live_data['status']=$_POST['status'];
 $live_data['user_name']=$_POST['name'];
@@ -64,26 +65,36 @@ for ($i=0 ;$i <4 ; $i++) {
 }
 
 $img_array=json_decode($_POST['img_ay']);
-for ($i=0; $i <5 ; $i++) { 
-	if(isset($img_array[$i])){
-		$live_data['img_url'][$i]=$img_array[$i];
-	}
-	else
-		$live_data['img_url'][$i]='';
-}
-
 $live_data['special_direct']=$_POST['special_direct'];
 $live_data['experience']=$_POST['experience'];
+//$liver_no='1111';
 $no_class="liver_no";
 $liver_no=get_num($no_class);
-echo $liver_no;
-//exit;
-move_img($img_array,$liver_no);
-print_r($live_data);
-exit;
+if(!$liver_no){
+	echo "編號無產生!!";
+	exit;
+}
+$live_data['$liver_no']=$liver_no;
+//----------------------直播達人 資料設定 end-----------------------------------------------------
+
 $liveconn = mysql_connect('10.50.21.12','achleader','ach1234');
-$sql = "insert into live.live_data (id,liver_no,name,status,coordination,stage_name,sex,location,birthday,profession,body,address,phone,cell_phone,line_id,email,weixin_id,manager,manager_phone,category,skill,live_ex,fb_info,17_info,up_info,me_info,img1,img2,img3,img4,img5,special_direct,experience,ins_time,update_time) values ('','','".$live_data['user_name']."','".$live_data['status']."','".$live_data['coordination']."','".$live_data['stage_name']."','".$live_data['sex']."','".$live_data['location']."','".$live_data['birthday']."','".$live_data['profession']."','".$live_data['body']."','".$live_data['address']."','".$live_data['phone']."','".$live_data['cell_phone']."','".$live_data['line_id']."','".$live_data['email']."','".$live_data['weixin_id']."','".$live_data['manager']."','".$live_data['manager_phone']."','".$live_data['category']."','".$live_data['skill']."','".$live_data['ex_has']."','".$live_data['live_info'][0]."','".$live_data['live_info'][1]."','".$live_data['live_info'][2]."','".$live_data['live_info'][3]."','".$live_data['img_url'][0]."','".$live_data['img_url'][1]."','".$live_data['img_url'][2]."','".$live_data['img_url'][3]."','".$live_data['img_url'][4]."','".$live_data['special_direct']."','".$live_data['experience']."','$time','$time')";
- mysql_query($sql, $liveconn) ;
+$sql ="select * from live.live_data where liver_no='$liver_no'";
+$result=mysql_query($sql, $liveconn);
+$result_num=mysql_num_rows($result);
+
+if($result_num==0){
+	del_move_img($img_array,$liver_no);
+    $live_data['img_url']=change_img($liver_no);//取得圖片路徑
+
+        $sql = "insert into live.live_data (id,liver_no,name,status,coordination,stage_name,sex,location,birthday,profession,body,address,phone,cell_phone,line_id,email,weixin_id,manager,manager_phone,category,skill,live_ex,fb_info,17_info,up_info,me_info,img1,img2,img3,img4,img5,special_direct,experience,ins_time,update_time) values ('','".$live_data['$liver_no']."','".$live_data['user_name']."','".$live_data['status']."','".$live_data['coordination']."','".$live_data['stage_name']."','".$live_data['sex']."','".$live_data['location']."','".$live_data['birthday']."','".$live_data['profession']."','".$live_data['body']."','".$live_data['address']."','".$live_data['phone']."','".$live_data['cell_phone']."','".$live_data['line_id']."','".$live_data['email']."','".$live_data['weixin_id']."','".$live_data['manager']."','".$live_data['manager_phone']."','".$live_data['category']."','".$live_data['skill']."','".$live_data['ex_has']."','".$live_data['live_info'][0]."','".$live_data['live_info'][1]."','".$live_data['live_info'][2]."','".$live_data['live_info'][3]."','".$live_data['img_url'][0]."','".$live_data['img_url'][1]."','".$live_data['img_url'][2]."','".$live_data['img_url'][3]."','".$live_data['img_url'][4]."','".$live_data['special_direct']."','".$live_data['experience']."','$time','$time')";
+        mysql_query($sql, $liveconn);
+}
+else{
+	echo "會員編號重複!!";
+	exit;
+}
+
+print_r($live_data);
 
 ?>
 
@@ -108,10 +119,10 @@ mysql_query($sql, $liveconn);
 return $liver_no;
 }
 
-function move_img($img_array,$live_no){
+function del_move_img($img_array,$live_no){
  $dir=$live_no;
- $pwd="/home/webuser/live/www/upload/up_img/";
- $pre_dir="/home/webuser/live/www/upload/up_img/temporary/";
+ $pwd="/home/webuser/live/www/upload/live_up_img/";
+ $pre_dir="/home/webuser/live/www/upload/live_up_img/liver_img_temporary/";
  
  if(!file_exists($pwd.$dir)){
  $oldmask = umask(0);
@@ -126,20 +137,29 @@ foreach ($img_array as $key => $value) {
         copy($pre_name, $name);
         unlink($pre_name);
     
+ }
 }
-$dirname=$pwd.$dir."/";
-$dh=opendir($pwd.$dir);
+function change_img($live_no){
+$pwd="/home/webuser/live/www/upload/live_up_img/";
+$dirname=$pwd.$live_no."/";
+$dh=opendir($dirname);
+$return_img_array=array();
 $i=1;
 while ($dave=readdir($dh))
 {
-if ($dave != "." && $dave != "..") { 
-	$ex_name=pathinfo($dirname.$dave,PATHINFO_EXTENSION);
-//echo $dave." ";
-rename($dirname.$dave,$dirname.$dir."_".$i.".".$ex_name);
-$i++;
-} 
+   if ($dave != "." && $dave != "..") { 
+	 $ex_name=pathinfo($dirname.$dave,PATHINFO_EXTENSION);
+     rename($dirname.$dave,$dirname.$live_no."_".$i.".".$ex_name);
+     $return_img_array[$i-1]=$dirname.$live_no."_".$i.".".$ex_name;
+     $i++;
+    }
+}
+for ($i=0; $i <5 ; $i++) { 
+	if(!isset($return_img_array[$i])){
+		$return_img_array[$i]='';
+	}
 }
 closedir ($dh);
-
+return $return_img_array;
 }
 ?>

@@ -1,8 +1,67 @@
 <?php
-$birth_year='';
-$birth_month='';
-$birth_day='';
-$sex=0;
+$live_no="L17080001";
+$liveconn=mysql_connect('10.50.21.12','achleader','ach1234');
+$sql="select * from live.live_data where liver_no='$live_no'";
+$result=mysql_query($sql, $liveconn);
+
+while ($r=mysql_fetch_array($result)) {
+  //print_r($r);
+      $live_data['status']=$r['status'];
+      $live_data['user_name']=$r['name'];
+      $live_data['sex']=$r['sex'];
+      $live_data['coordination']=$r['coordination'];
+      $live_data['location']=$r['location'];
+      $live_data['stage_name']=$r['stage_name'];
+      $live_data['birthday']=explode("-",$r['birthday']);
+      $live_data['profession']=$r['profession'];
+      $live_data['body']=explode("/",$r['body']);
+      $live_data['address']=explode("_",$r['address']);
+      $live_data['phone']=$r['phone'];
+      $live_data['cell_phone']=$r['cell_phone'];
+      $live_data['line_id']=$r['line_id'];
+      $live_data['email']=$r['email'];
+      $live_data['weixin_id']=$r['weixin_id'];
+      $live_data['manager']=$r['manager'];
+      $live_data['manager_phone']=$r['manager_phone'];
+      $live_data['category']=$r['category'];  
+      $live_data['skill']=$r['skill'];
+      $live_data['ex_has']=$r['live_ex'];
+      $live_data['fb_info']=explode("|",$r['fb_info']);
+      $live_data['17_info']=explode("|",$r['17_info']);
+      $live_data['up_info']=explode("|",$r['up_info']);
+      $live_data['me_info']=explode("|",$r['me_info']);
+      $live_data['img1']=$r['img1'];
+      $live_data['img2']=$r['img2'];
+      $live_data['img3']=$r['img3'];
+      $live_data['img4']=$r['img4'];
+      $live_data['img5']=$r['img5'];
+      $live_data['special_direct']=$r['special_direct'];
+      $live_data['experience']=$r['experience'];
+}
+
+$plaform_array=['fb_info','17_info','up_info','me_info'];
+for ($j=0; $j <4 ; $j++) { 
+      if($live_data[$plaform_array[$j]][0]==''){
+        for ($i=1; $i <=4 ; $i++) { 
+         $live_data[$plaform_array[$j]][$i]='';
+        }
+      }
+// print_r($live_data[$plaform_array[$j]]);
+// echo "<br>";
+}
+
+if($live_data['location']!='taiwan'&&$live_data['location']!='china'){
+  $live_data['location_text']=$live_data['location'];
+}
+else $live_data['location_text']="";
+
+if($live_data['manager']!='經紀公司1'&&$live_data['manager']!='經紀公司1'){
+  $live_data['manager_text']=$live_data['manager'];
+}
+else $live_data['manager_text']="";
+
+
+//print_r($live_data);
 ?>
 <!DOCTYPE html>
 <html>
@@ -11,6 +70,8 @@ $sex=0;
 <script language="JavaScript" type="text/JavaScript" src="/css/jquery-3.2.1.min.js"></script>
 <script language="JavaScript" src="/tinymce/tinymce.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
+ var bodyObj = document.getElementById("experience").contentDocument.getElementById("tinymce");
+alert(bodyObj.value)
 function showlocation(value) {
   //var loc_e = document.getElementById('else')
   if(value=='else'){
@@ -31,6 +92,7 @@ function manager_change(value) {
   }
   else{
     $("#manager_text").hide();
+    $("#manager_text").val("");
   }
 }
 
@@ -112,6 +174,21 @@ if (input.files && input.files[0]) {
 
 </script>
 <script type="text/javascript">
+
+$(function () {
+   if($("#else").attr('checked')){   //修改頁 location else 顯示text     
+       $("#location_text").show();
+  }
+
+  if($("#man_has").attr('checked')){  //修改頁 man_has 顯示table      
+       $("#manager_table").show();
+  }
+  
+  if($("#man_else").attr('selected')){  //修改頁 man_has 顯示table      
+       $("#manager_text").show();
+  }
+});
+
 $(function () { //進去div後顯示右上角X
         $("#preview_img1").on("mouseenter","div",function () {
            // alert(this.id.substring(4))
@@ -389,14 +466,14 @@ function check_form(){
   <tr>
   	<td><h4>基本資料</h4></td>
   	<td >*狀態:
-  	    <input type="radio" name="status" id="status" value="online">上線
-  	    <input type="radio" name="status" value="offline">下線
-  	    <input type="radio" name="status" value="wait">待審核
+  	    <input type="radio" name="status" id="status" value="online" <? if ($live_data['status']=="online") echo "checked"; ?>>上線
+  	    <input type="radio" name="status" value="offline" <? if ($live_data['status']=="offline") echo "checked"; ?>>下線
+  	    <input type="radio" name="status" value="wait" <? if ($live_data['status']=="wait") echo "checked"; ?>>待審核
   	   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   	    *配合度:<select name="coordination" id="coordination">
-        <option value="-1">請選擇</option>　      
-        <option value="1">配合度1</option>
-　      <option value="2">配合度2</option>
+        <option value="-1" >請選擇</option>　      
+        <option value="1" <? if ($live_data['coordination']==1) echo "selected"; ?>>配合度1</option>
+　      <option value="2" <? if ($live_data['coordination']==2) echo "selected"; ?>>配合度2</option>
         </select>
   	</td>
   </tr>
@@ -404,44 +481,44 @@ function check_form(){
 
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr >
-  	<td height=40>*真實姓名:<input  name="name" type="text"  id="name" value="">
+  	<td height=40>*真實姓名:<input  name="name" type="text"  id="name" value="<?=$live_data['user_name']?>">
   	   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   	    *性別:
-  	    <input type="radio" id="sex" name="sex" value="1" >男
-  	    <input type="radio" name="sex" value="0" >女<!-- <? if ($sex==0) echo "selected"; ?> -->
+  	    <input type="radio" id="sex" name="sex" value="1" <? if ($live_data['sex']==1) echo "checked"; ?>>男
+  	    <input type="radio" name="sex" value="0" <? if ($live_data['sex']==0) echo "checked"; ?>>女<!-- <? if ($sex==0) echo "selected"; ?> -->
   	   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   	    *地區:
-  	    <input type="radio" id="location" name="location" value="taiwan" onclick="if(this.checked)showlocation(this.value);">台灣
-  	    <input type="radio" name="location" value="china" onclick="if(this.checked)showlocation(this.value);">大陸
-        <input type="radio" id="else" name="location" value="else" onclick="if(this.checked)showlocation(this.value);">其他
-  	    <input  id="location_text" name="location_text" type="text" size="10" value="" style="display:none;">
+  	    <input type="radio" id="location" name="location" value="taiwan" onclick="if(this.checked)showlocation(this.value);" <?if($live_data['location']=="taiwan") echo "checked";?>>台灣
+  	    <input type="radio" name="location" value="china" onclick="if(this.checked)showlocation(this.value);" <?if($live_data['location']=="china") echo "checked";?>>大陸
+        <input type="radio" id="else" name="location" value="else" onclick="if(this.checked)showlocation(this.value);" <?if($live_data['location']!="taiwan"&&$live_data['location']!="china"&&$live_data['location']!='') echo "checked";?>>其他
+  	    <input  id="location_text" name="location_text" type="text" size="10" value="<?=$live_data['location_text']?>" style="display:none;">
   	</td>
   </tr>
 </table>
 
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
-  	<td height=40>*藝名:<input id="stage_name" name="stage_name" type="text" value="">
+  	<td height=40>*藝名:<input id="stage_name" name="stage_name" type="text" value="<?=$live_data['stage_name']?>">
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   	*出生年月日:
   		<select name="birth_year" id="birth_year">
                   <option value="-1" selected="selected">--</option>
 <?for($i=1900;$i<date("Y");$i++){?>
-                  <option value="<?=$i;?>"<?echo ($birth_year==$i)?" selected":"";?>><?=$i;?> </option>
+                  <option value="<?=$i;?>"<?echo ($live_data['birthday'][0]==$i)?" selected":"";?>><?=$i;?> </option>
 <?}?>
                   </select>
 年
                   <select name="birth_month" id="birth_month">
                   <option value="-1">--</option>
 <?for($i=1;$i<13;$i++){?>
-                  <option value="<?=$i;?>"<?echo ($birth_month==$i)?" selected":"";?>><?=$i;?> </option>
+                  <option value="<?=$i;?>"<?echo ($live_data['birthday'][1]==$i)?" selected":"";?>><?=$i;?> </option>
 <?}?>
                   </select>
 月
                   <select name="birth_day" id="birth_day">
                   <option value="-1">--</option>
 <?for($i=1;$i<32;$i++){?>
-                  <option value="<?=$i;?>"<?echo ($birth_day==$i)?" selected":"";?>><?=$i;?> </option>
+                  <option value="<?=$i;?>"<?echo ($live_data['birthday'][2]==$i)?" selected":"";?>><?=$i;?> </option>
 <?}?>
                   </select>
         日
@@ -450,9 +527,9 @@ function check_form(){
 
   <tr>
   	<td height=40>
-    *身高/體重:<input  id="high" name="high" type="text" size="5" value="">公分/<input id="wight" name="wight" type="text" size="5" value="">公斤
+    *身高/體重:<input  id="high" name="high" type="text" size="5" value="<?=$live_data['body'][0]?>">公分/<input id="wight" name="wight" type="text" size="5" value="<?=$live_data['body'][1]?>">公斤
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  	*職業:<input id="profession" name="profession" type="text" value=""></td>
+  	*職業:<input id="profession" name="profession" type="text" value="<?=$live_data['profession']?>"></td>
   </tr>	
 </table>
 <table align="center" width="85%" bgcolor="#f3f3f3">
@@ -461,19 +538,19 @@ function check_form(){
   </tr>
 
   <tr>
-  	<td height=40 width="60%">*聯絡地址:<input id="postal_code" name="postal_code" type="text" size="5" placeholder="郵遞區號" ><!-- <td height=40 width="60%">*聯絡地址:<input  style="color:#a0a0a1" name="postal_code" type="text" size="5" value="郵遞區號" color="#a0a0a1" onMouseDown="window.status='郵遞區號';if(this.value=='郵遞區號') this.value=''";> -->&nbsp;<input id="address" name="address" type="text" size="80" value=""></td>
+  	<td height=40 width="60%">*聯絡地址:<input id="postal_code" name="postal_code" type="text" size="5" placeholder="郵遞區號" value="<?=$live_data['address'][0]?>"><!-- <td height=40 width="60%">*聯絡地址:<input  style="color:#a0a0a1" name="postal_code" type="text" size="5" value="郵遞區號" color="#a0a0a1" onMouseDown="window.status='郵遞區號';if(this.value=='郵遞區號') this.value=''";> -->&nbsp;<input id="address" name="address" type="text" size="80" value="<?=$live_data['address'][1]?>"></td>
   </tr>
 </table>
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
-  	<td height=40>聯絡電話: 市話:<input  name="phone" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp;
-  	*手機:<input id="cell_phone" name="cell_phone" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp;
-  	*LINE ID:<input  id="line_id" name="line_id" type="text" value="">
+  	<td height=40>聯絡電話: 市話:<input  name="phone" type="text" value="<?=$live_data['phone']?>">&nbsp;&nbsp;&nbsp;&nbsp;
+  	*手機:<input id="cell_phone" name="cell_phone" type="text" value="<?=$live_data['cell_phone']?>">&nbsp;&nbsp;&nbsp;&nbsp;
+  	*LINE ID:<input  id="line_id" name="line_id" type="text" value="<?=$live_data['line_id']?>">
     </td>
   </tr>
   <tr>
-    <td height=40>E-MAIL:<input id="email" name="email" type="email" value="" size="60">&nbsp;&nbsp;&nbsp;&nbsp;
-    *微信 ID:<input  name="weixinid" type="text" value="">
+    <td height=40>E-MAIL:<input id="email" name="email" type="email" value="<?=$live_data['email']?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;
+    *微信 ID:<input  name="weixinid" type="text" value="<?=$live_data['weixin_id']?>">
     </td>
   </tr>
 </table align="center" width="85%" bgcolor="#f3f3f3">
@@ -481,8 +558,8 @@ function check_form(){
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
   	<td height="40">*是否有經紀約:
-  	    <input type="radio" id="man_has" name="man_has" value="1" >有
-  	    <input type="radio" id="man_no" name="man_has" value="0" >無
+  	    <input type="radio" id="man_has" name="man_has" value="1" <?if($live_data['manager']!="")echo "checked"?>>有
+  	    <input type="radio" id="man_no" name="man_has" value="0" <?if($live_data['manager']=="")echo "checked"?>>無
   	</td>
   </tr>
   </table>
@@ -491,11 +568,11 @@ function check_form(){
   	<td>
   	經紀人/經紀公司:<select id="manager" name="manager" onchange="manager_change(this.value)">
         <option value="-1">請選擇</option>　      
-        <option value="經紀公司1">經紀公司1</option>
-　      <option value="經紀公司2">經紀公司2</option>
-        <option value="else">其他</option>
+        <option value="經紀公司1" <?if($live_data['manager']=="經紀公司1") echo "selected"?>>經紀公司1</option>
+　      <option value="經紀公司2" <?if($live_data['manager']=="經紀公司2") echo "selected"?>>經紀公司2</option>
+        <option id="man_else" value="else" <?if($live_data['manager']!="經紀公司1"&&$live_data['manager']!="經紀公司2"&&$live_data['manager']!="") echo "selected"?>>其他</option>
         </select>
-        <input  id="manager_text" name="manager_text" type="text" size="50" value="" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;聯絡電話(經紀人/公司):<input id="manager_phone" name="manager_phone" type="text" value="">
+        <input  id="manager_text" name="manager_text" type="text" size="50" value="<?=$live_data['manager_text']?>" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;聯絡電話(經紀人/公司):<input id="manager_phone" name="manager_phone" type="text" value="<?=$live_data['manager_phone']?>">
     </td>
   </tr>
 </table>
@@ -506,31 +583,31 @@ function check_form(){
   </tr>
   <tr>
     <td height="40">*分類:
-      <input id="category" type="checkbox" value="美食" name="category[]">美食
-      <input type="checkbox" value="美妝" name="category[]">美妝
-      <input type="checkbox" value="遊戲" name="category[]">遊戲
-      <input type="checkbox" value="生活" name="category[]">生活
-      <input type="checkbox" value="拍賣" name="category[]">拍賣
+      <input id="category" type="checkbox" value="美食" name="category[]" <?if(preg_match("/美食/",$live_data['category'])) echo "checked"?>>美食
+      <input type="checkbox" value="美妝" name="category[]" <?if(preg_match("/美妝/",$live_data['category'])) echo "checked"?>>美妝
+      <input type="checkbox" value="遊戲" name="category[]" <?if(preg_match("/遊戲/",$live_data['category'])) echo "checked"?>>遊戲
+      <input type="checkbox" value="生活" name="category[]" <?if(preg_match("/生活/",$live_data['category'])) echo "checked"?>>生活
+      <input type="checkbox" value="拍賣" name="category[]" <?if(preg_match("/拍賣/",$live_data['category'])) echo "checked"?>>拍賣
     </td>
   </tr>
   <tr>
     <td height="40">*特殊才藝:
-      <input id="skill" type="checkbox" value="唱歌" name="skill[]">唱歌
-      <input type="checkbox" value="跳舞" name="skill[]">跳舞
-      <input type="checkbox" value="吉他" name="skill[]">吉他
-      <input type="checkbox" value="烏克麗麗" name="skill[]">烏克麗麗
-      <input type="checkbox" value="鋼琴" name="skill[]">鋼琴
-      <input type="checkbox" value="長笛" name="skill[]">長笛
-      <input type="checkbox" value="爵士鼓" name="skill[]">爵士鼓
-      <input type="checkbox" value="電子琴" name="skill[]">電子琴
-      <input type="checkbox" value="魔術" name="skill[]">魔術
-      <input type="checkbox" value="遊戲實況" name="skill[]">遊戲實況
+      <input id="skill" type="checkbox" value="唱歌" name="skill[]" <?if(preg_match("/唱歌/",$live_data['skill'])) echo "checked"?>>唱歌
+      <input type="checkbox" value="跳舞" name="skill[]" <?if(preg_match("/跳舞/",$live_data['skill'])) echo "checked"?>>跳舞
+      <input type="checkbox" value="吉他" name="skill[]" <?if(preg_match("/吉他/",$live_data['skill'])) echo "checked"?>>吉他
+      <input type="checkbox" value="烏克麗麗" name="skill[]" <?if(preg_match("/烏克麗麗/",$live_data['skill'])) echo "checked"?>>烏克麗麗
+      <input type="checkbox" value="鋼琴" name="skill[]" <?if(preg_match("/鋼琴/",$live_data['skill'])) echo "checked"?>>鋼琴
+      <input type="checkbox" value="長笛" name="skill[]" <?if(preg_match("/長笛/",$live_data['skill'])) echo "checked"?>>長笛
+      <input type="checkbox" value="爵士鼓" name="skill[]" <?if(preg_match("/爵士鼓/",$live_data['skill'])) echo "checked"?>>爵士鼓
+      <input type="checkbox" value="電子琴" name="skill[]" <?if(preg_match("/電子琴/",$live_data['skill'])) echo "checked"?>>電子琴
+      <input type="checkbox" value="魔術" name="skill[]" <?if(preg_match("/魔術/",$live_data['skill'])) echo "checked"?>>魔術
+      <input type="checkbox" value="遊戲實況" name="skill[]" <?if(preg_match("/遊戲實況/",$live_data['skill'])) echo "checked"?>>遊戲實況
     </td>
   </tr>
   <tr>
     <td height="40">是否有直播經驗:
-       <input type="radio" id="ex_has" name="ex_has" value="1">有
-       <input type="radio" name="ex_has" value="0">無
+       <input type="radio" id="ex_has" name="ex_has" value="1" <?if($live_data['ex_has']='1') echo "checked"?>>有
+       <input type="radio" name="ex_has" value="0" <?if($live_data['ex_has']='0') echo "checked"?>>無
     </td>
   </tr>
 </table>
@@ -540,31 +617,31 @@ function check_form(){
     <td height="40">直播平台:</td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" id="live_check1" value="fb" name="live_check1">FB</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan1" name="live_fan1">人/ 連結:<input type="text" id="live_link1" name="live_link1" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform1" name="live_platform1[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform1[]" value="web">電腦
+    <td height="40"><input type="checkbox" id="live_check1" value="fb" name="live_check1" <?if($live_data['fb_info'][0]=='fb') echo "checked"?>>FB</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan1" name="live_fan1" value="<?=$live_data['fb_info'][1]?>">人/ 連結:<input type="text" id="live_link1" name="live_link1" value="<?=$live_data['fb_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
+     <input type="checkbox" id="live_platform1" name="live_platform1[]" value="mobile" <?if(preg_match("/mobile/",$live_data['fb_info'][3])||preg_match("/mobile/",$live_data['fb_info'][4])) echo "checked"?>>手機
+     <input type="checkbox"  name="live_platform1[]" value="web" <?if(preg_match("/web/",$live_data['fb_info'][3])||preg_match("/web/",$live_data['fb_info'][4])) echo "checked"?>>電腦
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="17" id="live_check2" name="live_check2">17直播</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan2" name="live_fan2">人/ 連結:<input type="text" id="live_link2" name="live_link2" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform2" name="live_platform2[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform2[]" value="web">電腦
+    <td height="40"><input type="checkbox" value="17" id="live_check2" name="live_check2" <?if($live_data['17_info'][0]=='17') echo "checked"?>>17直播</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan2" name="live_fan2" value="<?=$live_data['17_info'][1]?>">人/ 連結:<input type="text" id="live_link2" name="live_link2" value="<?=$live_data['fb_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
+     <input type="checkbox" id="live_platform2" name="live_platform2[]" value="mobile" <?if(preg_match("/mobile/",$live_data['17_info'][3])||preg_match("/mobile/",$live_data['17_info'][4])) echo "checked"?>>手機
+     <input type="checkbox"  name="live_platform2[]" value="web" <?if(preg_match("/web/",$live_data['17_info'][3])||preg_match("/web/",$live_data['17_info'][4])) echo "checked"?>>電腦
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="up" id="live_check3" name="live_check3">UP直播</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan3" name="live_fan3">人/ 連結:<input type="text" id="live_link3" name="live_link3" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox"  id="live_platform3" name="live_platform3[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform3[]" value="web">電腦
+    <td height="40"><input type="checkbox" value="up" id="live_check3" name="live_check3" <?if($live_data['up_info'][0]=='up') echo "checked"?>>UP直播</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan3" name="live_fan3" value="<?=$live_data['up_info'][1]?>">人/ 連結:<input type="text" id="live_link3" name="live_link3" value="<?=$live_data['up_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
+     <input type="checkbox"  id="live_platform3" name="live_platform3[]" value="mobile" <?if(preg_match("/mobile/",$live_data['up_info'][3])||preg_match("/mobile/",$live_data['up_info'][4])) echo "checked"?>>手機
+     <input type="checkbox"  name="live_platform3[]" value="web" <?if(preg_match("/web/",$live_data['up_info'][3])||preg_match("/web/",$live_data['up_info'][4])) echo "checked"?>>電腦
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="me" id="live_check4" name="live_check4">Liveme</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan4" name="live_fan4">人/ 連結:<input type="text" id="live_link4" name="live_link4" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform4" name="live_platform4[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform4[]" value="web">電腦
+    <td height="40"><input type="checkbox" value="me" id="live_check4" name="live_check4" <?if($live_data['me_info'][0]=='me') echo "checked"?>>Liveme</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan4" name="live_fan4" value="<?=$live_data['me_info'][1]?>">人/ 連結:<input type="text" id="live_link4" name="live_link4" value="<?$live_data['me_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
+     <input type="checkbox" id="live_platform4" name="live_platform4[]" value="mobile" <?if(preg_match("/mobile/",$live_data['me_info'][3])||preg_match("/mobile/",$live_data['me_info'][4])) echo "checked"?>>手機
+     <input type="checkbox"  name="live_platform4[]" value="web" <?if(preg_match("/web/",$live_data['me_info'][3])||preg_match("/web/",$live_data['me_info'][4])) echo "checked"?>>電腦
     </td>
   </tr>
 </table>
@@ -590,7 +667,7 @@ function check_form(){
      <td><h4>特色說明：(字數限制30字)</h4></td>
    </tr>
    <tr>
-     <td ><input type="text" id="special_direct" name="special_direct" size="140"></td>
+     <td ><input type="text" id="special_direct" name="special_direct" size="140" value="<?=$live_data['special_direct']?>"></td>
    </tr>
 </table>
 
