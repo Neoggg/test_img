@@ -56,7 +56,7 @@ if (input.files && input.files[0]) {
               
               for($i=0;$i<filelist.length;$i++){    
                 
-                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:4;"></div>'; //先生成預覽圖所需要div
+                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="padding-right:10px;  display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:10;"></div>'; //先生成預覽圖所需要div
                 $('#preview_img1').append(div_str);
                 
                 var file= filelist[$i]                             
@@ -73,7 +73,7 @@ if (input.files && input.files[0]) {
                 $("div[name='"+app_div+"']").append(load);
                   var app_div="div_"+ file_array+"_"+file.name;
                   //var app_img="img_"+ file_array+"_"+file.name;
-                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:5px; width:30px; height:30px; display:none">&nbsp;';
+                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none">&nbsp;';
                    //var img_del_str='<img  src="/images/del_pre.png" style="position : absolute;top : 0px;right : 0px;width : 20px;height : 20px;">'
                    //$('#preview_img1').append(img_str);
                    $("div[name='"+app_div+"']").append(img_str);
@@ -145,7 +145,9 @@ $(function () { //顯示經紀人table
    $(function () { //點右上X後刪除檔案與預覽圖
                 $("#preview_img1").on("click", "img", function () {
                  if(this.id.match("del_")){
-                 var del_info="del_info="+this.id.substring(4) 
+                 var live_no="";
+                 var form="new";
+                 var del_info="del_info="+this.id.substring(4)+"&live_no="+live_no+"&form="+form
                     if (confirm("確定移除圖片?")) {
 //-------------------ajax開始-----------------------------------------                              
                     $.ajax({

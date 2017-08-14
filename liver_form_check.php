@@ -1,6 +1,14 @@
 <?php
 print_r($_POST);
 echo "<br>";
+$liver_no=$_POST['live_no'];
+$img_array=json_decode($_POST['img_ay']);
+if(!empty($img_array)){ //有新的圖片上傳才需要重傳
+	del_move_img($img_array,$liver_no);
+	$live_data['img_url']=change_img($liver_no);
+	print_r($live_data['img_url']);
+}
+exit;
 $time=date("Y-m-d H:i:s");
 //----------------------直播達人 資料設定--------------------------------------------------------
 $live_data=array();
@@ -64,12 +72,14 @@ for ($i=0 ;$i <4 ; $i++) {
 
 }
 
-$img_array=json_decode($_POST['img_ay']);
+$img_array=json_decode($_POST['img_ay']);//圖片解碼
 $live_data['special_direct']=$_POST['special_direct'];
 $live_data['experience']=$_POST['experience'];
 //$liver_no='1111';
 $no_class="liver_no";
-$liver_no=get_num($no_class);
+if($_POST['live_no']!='') $liver_no=$_POST['live_no'];
+else $liver_no=get_num($no_class);
+
 if(!$liver_no){
 	echo "編號無產生!!";
 	exit;
@@ -88,6 +98,13 @@ if($result_num==0){
 
         $sql = "insert into live.live_data (id,liver_no,name,status,coordination,stage_name,sex,location,birthday,profession,body,address,phone,cell_phone,line_id,email,weixin_id,manager,manager_phone,category,skill,live_ex,fb_info,17_info,up_info,me_info,img1,img2,img3,img4,img5,special_direct,experience,ins_time,update_time) values ('','".$live_data['$liver_no']."','".$live_data['user_name']."','".$live_data['status']."','".$live_data['coordination']."','".$live_data['stage_name']."','".$live_data['sex']."','".$live_data['location']."','".$live_data['birthday']."','".$live_data['profession']."','".$live_data['body']."','".$live_data['address']."','".$live_data['phone']."','".$live_data['cell_phone']."','".$live_data['line_id']."','".$live_data['email']."','".$live_data['weixin_id']."','".$live_data['manager']."','".$live_data['manager_phone']."','".$live_data['category']."','".$live_data['skill']."','".$live_data['ex_has']."','".$live_data['live_info'][0]."','".$live_data['live_info'][1]."','".$live_data['live_info'][2]."','".$live_data['live_info'][3]."','".$live_data['img_url'][0]."','".$live_data['img_url'][1]."','".$live_data['img_url'][2]."','".$live_data['img_url'][3]."','".$live_data['img_url'][4]."','".$live_data['special_direct']."','".$live_data['experience']."','$time','$time')";
         mysql_query($sql, $liveconn);
+}
+else if($result_num==1){
+	// del_move_img($img_array,$liver_no);
+ //    $live_data['img_url']=change_img($liver_no);//取得圖片路徑
+
+ //        $sql = "insert into live.live_data (id,liver_no,name,status,coordination,stage_name,sex,location,birthday,profession,body,address,phone,cell_phone,line_id,email,weixin_id,manager,manager_phone,category,skill,live_ex,fb_info,17_info,up_info,me_info,img1,img2,img3,img4,img5,special_direct,experience,ins_time,update_time) values ('','".$live_data['$liver_no']."','".$live_data['user_name']."','".$live_data['status']."','".$live_data['coordination']."','".$live_data['stage_name']."','".$live_data['sex']."','".$live_data['location']."','".$live_data['birthday']."','".$live_data['profession']."','".$live_data['body']."','".$live_data['address']."','".$live_data['phone']."','".$live_data['cell_phone']."','".$live_data['line_id']."','".$live_data['email']."','".$live_data['weixin_id']."','".$live_data['manager']."','".$live_data['manager_phone']."','".$live_data['category']."','".$live_data['skill']."','".$live_data['ex_has']."','".$live_data['live_info'][0]."','".$live_data['live_info'][1]."','".$live_data['live_info'][2]."','".$live_data['live_info'][3]."','".$live_data['img_url'][0]."','".$live_data['img_url'][1]."','".$live_data['img_url'][2]."','".$live_data['img_url'][3]."','".$live_data['img_url'][4]."','".$live_data['special_direct']."','".$live_data['experience']."','$time','$time')";
+ //        mysql_query($sql, $liveconn);
 }
 else{
 	echo "會員編號重複!!";
@@ -141,6 +158,8 @@ foreach ($img_array as $key => $value) {
 }
 function change_img($live_no){
 $pwd="/home/webuser/live/www/upload/live_up_img/";
+$db_pwd="/upload/live_up_img/";
+$db_dir=$db_pwd.$live_no."/";//存進DB用
 $dirname=$pwd.$live_no."/";
 $dh=opendir($dirname);
 $return_img_array=array();
@@ -150,7 +169,7 @@ while ($dave=readdir($dh))
    if ($dave != "." && $dave != "..") { 
 	 $ex_name=pathinfo($dirname.$dave,PATHINFO_EXTENSION);
      rename($dirname.$dave,$dirname.$live_no."_".$i.".".$ex_name);
-     $return_img_array[$i-1]=$dirname.$live_no."_".$i.".".$ex_name;
+     $return_img_array[$i-1]=$db_dir.$live_no."_".$i.".".$ex_name;
      $i++;
     }
 }

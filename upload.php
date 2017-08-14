@@ -1,7 +1,18 @@
 <?php
-//print_r($_POST);
-//print_r($_FILES);
-//exit;
+//--------------------直接傳到liver 資料夾用-----------------------
+// $live_no = $_POST['live_no'];
+// $dirname="/home/webuser/live/www/upload/live_up_img/".$live_no;
+// foreach ($_FILES["img_file"]["name"] as $key => $value) {        
+//         $tmp_name = $_FILES["img_file"]["tmp_name"][$key];
+//         $name = $dirname."/".$_FILES["img_file"]["name"][$key];        
+//         move_uploaded_file($tmp_name, $name);
+// }
+//------------------------------------------------------------------
+
+// print_r($_POST);
+// print_r($_FILES);
+// exit;
+
 $dir="liver_img_temporary";
 $pwd="upload/live_up_img/";
 //上傳檔案-----------------------------

@@ -1,5 +1,5 @@
 <?php
-$live_no="L17080001";
+$live_no="L17080003";
 $liveconn=mysql_connect('10.50.21.12','achleader','ach1234');
 $sql="select * from live.live_data where liver_no='$live_no'";
 $result=mysql_query($sql, $liveconn);
@@ -46,8 +46,6 @@ for ($j=0; $j <4 ; $j++) {
          $live_data[$plaform_array[$j]][$i]='';
         }
       }
-// print_r($live_data[$plaform_array[$j]]);
-// echo "<br>";
 }
 
 if($live_data['location']!='taiwan'&&$live_data['location']!='china'){
@@ -60,8 +58,14 @@ if($live_data['manager']!='經紀公司1'&&$live_data['manager']!='經紀公司1
 }
 else $live_data['manager_text']="";
 
+// for ($i=1; $i <=5 ; $i++) { 
+//     if($live_data['img'.$i]!=''){
+//       $live_img_array=explode('/', $live_data['img'.$i]);
+//       $live_name=$live_img_array[4];     
+//       echo '<div id=div_' .$live_name. ' style="padding-right:10px; display : inline-block; position : relative;"><img  src='.$live_data['img'.$i].' id=img_'.$live_name.' name=img_'.$live_name.' width="200" height="150" class="pre_img" /><img  id=del_' .$live_name. ' src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none"></div>';
+//     }
+// }
 
-//print_r($live_data);
 ?>
 <!DOCTYPE html>
 <html>
@@ -101,8 +105,9 @@ function readimg_multiple(input) {
  var file_array= Math.random().toString(36).substring(2,6)
 
  var pre_sum= document.getElementsByClassName('pre_img').length //抓class算長度
+ var pre_user_sum= document.getElementsByClassName('pre_img_user').length 
  var file_can_use=0
- file_can_use=5-pre_sum
+ file_can_use=5-pre_sum-pre_user_sum
  if(input.files.length>file_can_use){
     alert('最多只能上傳5張照片');
     return false;
@@ -115,10 +120,11 @@ if (input.files && input.files[0]) {
                var xhr = new XMLHttpRequest();
                var up_progress = document.getElementById('up_progress');
                xhr.open('POST', '/upload.php',true)
-              
+               //var live_no="<?=$live_no?>";
+               
               for($i=0;$i<filelist.length;$i++){    
                 
-                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:4;"></div>'; //先生成預覽圖所需要div
+                var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="padding-right:10px; display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:10;"></div>'; //先生成預覽圖所需要div
                 $('#preview_img1').append(div_str);
                 
                 var file= filelist[$i]                             
@@ -126,7 +132,7 @@ if (input.files && input.files[0]) {
                 var img_div=document.getElementById("preview_img1");
                 reader.readAsDataURL(file);
                 var app_load="load_"+ file_array+"_"+filelist[$i].name;
-              
+                
                 $("img[name='"+app_load+"']").show()
         
                
@@ -135,10 +141,11 @@ if (input.files && input.files[0]) {
                 $("div[name='"+app_div+"']").append(load);
                   var app_div="div_"+ file_array+"_"+file.name;
                   //var app_img="img_"+ file_array+"_"+file.name;
-                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:5px; width:30px; height:30px; display:none">&nbsp;';
+                   var img_str = '<img  src="' + event.target.result + '" id="' +"img_"+ file_array+"_"+file.name + '" name="' +"img_"+ file_array+"_"+file.name + '" width="200" height="150" class="pre_img" /><img  id="'+ "del_" +file_array+"_"+file.name +'" src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none">&nbsp;';
                    //var img_del_str='<img  src="/images/del_pre.png" style="position : absolute;top : 0px;right : 0px;width : 20px;height : 20px;">'
                    //$('#preview_img1').append(img_str);
                    $("div[name='"+app_div+"']").append(img_str);
+                   
                    xhr.send(fd);
                    
 
@@ -153,7 +160,7 @@ if (input.files && input.files[0]) {
 
                               
                 fd.append('img_file[]', filelist[$i],file_array+"_"+filelist[$i].name); 
-
+                //fd.append('live_no',live_no);若要post值可用 
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
                            if (xhr.status === 200) {
@@ -193,6 +200,7 @@ $(function () { //進去div後顯示右上角X
         $("#preview_img1").on("mouseenter","div",function () {
            // alert(this.id.substring(4))
             var show=document.getElementById("del_"+this.id.substring(4))
+            //alert(show.id)
             show.style.display="block"
 
         });
@@ -222,7 +230,10 @@ $(function () { //顯示經紀人table
    $(function () { //點右上X後刪除檔案與預覽圖
                 $("#preview_img1").on("click", "img", function () {
                  if(this.id.match("del_")){
-                 var del_info="del_info="+this.id.substring(4) 
+                  var live_no="<?=$live_no?>";
+                  var form="edit";
+                  
+                 var del_info="del_info="+this.id.substring(4)+"&live_no="+live_no+"&form="+form
                     if (confirm("確定移除圖片?")) {
 //-------------------ajax開始-----------------------------------------                              
                     $.ajax({
@@ -436,7 +447,8 @@ function check_form(){
      }
   }
   var img_sum= document.getElementsByClassName('pre_img').length
-        if(img_sum==0){  
+  var img_user_sum= document.getElementsByClassName('pre_img_user').length
+        if(img_sum==0&&img_user_sum==0){  
           alert("至少上傳一張圖片!");
           document.getElementById("add_new").focus()
           return false;  
@@ -462,6 +474,7 @@ function check_form(){
 <body>
 <form name="liver_form" id="liver_form" method="POST" action="/adm/liver_form_check.php" enctype="multipart/form-data">
 <input type="hidden" name="img_ay" id="img_ay">
+<input type="hidden" name="live_no" id="live_no" value="<?=$live_no?>">
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
   	<td><h4>基本資料</h4></td>
@@ -656,8 +669,17 @@ function check_form(){
      <td>
        
         <input type="file" name="img_file[]" id="img_file" size="20" onchange="readimg_multiple(this);" style="display: none;" accept="image/jpeg,image/gif,image/png" multiple>
-        <div id="preview_img1" ><img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" /></div> <!-- 預覽圖片位置 -->
-    
+        <div id="preview_img1" ><?
+        for ($i=1; $i <=5 ; $i++) { 
+            if($live_data['img'.$i]!=''){
+              $live_img_array=explode('/', $live_data['img'.$i]);
+              $live_name=$live_img_array[4];     
+              echo '<div id=div_'.$live_name.' name=div_'.$live_name.' style="padding-right:10px; display : inline-block; position : relative;"><img  src='.$live_data['img'.$i].' id=img_'.$live_name.' name=img_'.$live_name.' width="200" height="150" class="pre_img_user" /><img  id=del_'.$live_name.' src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none;"></div>';
+            }
+        }
+        ?>
+        <img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" /></div> <!-- 預覽圖片位置 -->
+    <div id="searchResult"></div>
      </td>
    </tr>
 </table>
