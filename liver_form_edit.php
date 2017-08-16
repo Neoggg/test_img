@@ -42,7 +42,7 @@ while ($r=mysql_fetch_array($result)) {
 $plaform_array=['fb_info','17_info','up_info','me_info'];
 for ($j=0; $j <4 ; $j++) { 
       if($live_data[$plaform_array[$j]][0]==''){
-        for ($i=1; $i <=4 ; $i++) { 
+        for ($i=1; $i <=2 ; $i++) { 
          $live_data[$plaform_array[$j]][$i]='';
         }
       }
@@ -58,14 +58,7 @@ if($live_data['manager']!='經紀公司1'&&$live_data['manager']!='經紀公司1
 }
 else $live_data['manager_text']="";
 
-// for ($i=1; $i <=5 ; $i++) { 
-//     if($live_data['img'.$i]!=''){
-//       $live_img_array=explode('/', $live_data['img'.$i]);
-//       $live_name=$live_img_array[4];     
-//       echo '<div id=div_' .$live_name. ' style="padding-right:10px; display : inline-block; position : relative;"><img  src='.$live_data['img'.$i].' id=img_'.$live_name.' name=img_'.$live_name.' width="200" height="150" class="pre_img" /><img  id=del_' .$live_name. ' src="/images/del.png" style="position:absolute; top:0px; right:10px; width:30px; height:30px; display:none"></div>';
-//     }
-// }
-
+//print_r($live_data);
 ?>
 <!DOCTYPE html>
 <html>
@@ -74,8 +67,10 @@ else $live_data['manager_text']="";
 <script language="JavaScript" type="text/JavaScript" src="/css/jquery-3.2.1.min.js"></script>
 <script language="JavaScript" src="/tinymce/tinymce.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
- var bodyObj = document.getElementById("experience").contentDocument.getElementById("tinymce");
-alert(bodyObj.value)
+function set_content(){      //觸發tinymce內容設定
+        tinyMCE.get("experience").setContent("<?=$live_data['experience']?>");      
+        }
+
 function showlocation(value) {
   //var loc_e = document.getElementById('else')
   if(value=='else'){
@@ -183,6 +178,9 @@ if (input.files && input.files[0]) {
 <script type="text/javascript">
 
 $(function () {
+   //$('#experience').html("<?=$live_data['experience']?>");//tinymce 內容設定
+
+
    if($("#else").attr('checked')){   //修改頁 location else 顯示text     
        $("#location_text").show();
   }
@@ -202,14 +200,14 @@ $(function () { //進去div後顯示右上角X
             var show=document.getElementById("del_"+this.id.substring(4))
             //alert(show.id)
             show.style.display="block"
-
+            
         });
 
         $("#preview_img1").on("mouseleave","div",function () {
             var hide=document.getElementById("del_"+this.id.substring(4))
             hide.style.display="none"
 
-        });           
+        });          
     
   });
 
@@ -270,12 +268,20 @@ $(function () { //顯示經紀人table
 function check_form(){
     var all_form=document.forms['liver_form'];
     var pre_img= document.getElementsByClassName('pre_img')
+    var pre_img_user= document.getElementsByClassName('pre_img_user')
     var img_array = document.getElementById('img_ay');
-    var a=[];
+    var img_array_user = document.getElementById('img_ay_user');
+    var img_a=[];
+    var img_u=[];
     for($i=0;$i<pre_img.length;$i++){        
-        a[$i]=pre_img[$i].id.substring(4)      
+        img_a[$i]=pre_img[$i].id.substring(4)      
     }
-    img_array.value=JSON.stringify(a);
+    img_array.value=JSON.stringify(img_a);
+
+    for($i=0;$i<pre_img_user.length;$i++){        
+        img_u[$i]=pre_img_user[$i].id.substring(4)      
+    }
+    img_array_user.value=JSON.stringify(img_u);
 
     if(!all_form.elements.status.value){
       alert("請選擇狀態!")
@@ -414,37 +420,33 @@ function check_form(){
     $platform_num=4
     for($i=1;$i<= $platform_num;$i++){
      var chk_num=String($i);
-     var check1 = document.getElementById("live_check"+chk_num);
+     //var check1 = document.getElementById("live_check"+chk_num);
      var fan = document.getElementById("live_fan"+chk_num);
      var link = document.getElementById("live_link"+chk_num);
      var live_platform=document.getElementsByName("live_platform"+chk_num+"[]");
-     if(check1.checked){  
-        if(fan.value==''){  
+     if(link.value!=''&&fan.value==''){   
           alert("請輸入粉絲人數!");
           document.getElementById("live_fan"+chk_num).focus()
           return false;  
-        }
      }
-     if(check1.checked){  
-        if(link.value==''){  
-          alert("請輸入直播連結!");
-          document.getElementById("live_link"+chk_num).focus()
-          return false;  
-        }
-     }
-     if(check1.checked){  
-        var chk='f';
-        for($j=0;$j<live_platform.length;$j++){
-          if(live_platform[$j].checked==true){
-            chk='t';
-          }
-        }
-        if(chk=='f'){  
-          alert("請選擇直播平台!");
-          document.getElementById("live_platform"+chk_num).focus()
-          return false;  
-        }
-     }
+     // if(fan.value!=''&&link.value==''){   
+     //      alert("請輸入直播連結!");
+     //      document.getElementById("live_link"+chk_num).focus()
+     //      return false;  
+     // }
+     // if(check1.checked){  
+     //    var chk='f';
+     //    for($j=0;$j<live_platform.length;$j++){
+     //      if(live_platform[$j].checked==true){
+     //        chk='t';
+     //      }
+     //    }
+     //    if(chk=='f'){  
+     //      alert("請選擇直播平台!");
+     //      document.getElementById("live_platform"+chk_num).focus()
+     //      return false;  
+     //    }
+     // }
   }
   var img_sum= document.getElementsByClassName('pre_img').length
   var img_user_sum= document.getElementsByClassName('pre_img_user').length
@@ -471,9 +473,10 @@ function check_form(){
 
 </script>
 </head>
-<body>
+<body id="body">
 <form name="liver_form" id="liver_form" method="POST" action="/adm/liver_form_check.php" enctype="multipart/form-data">
 <input type="hidden" name="img_ay" id="img_ay">
+<input type="hidden" name="img_ay_user" id="img_ay_user">
 <input type="hidden" name="live_no" id="live_no" value="<?=$live_no?>">
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
@@ -563,7 +566,7 @@ function check_form(){
   </tr>
   <tr>
     <td height=40>E-MAIL:<input id="email" name="email" type="email" value="<?=$live_data['email']?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;
-    *微信 ID:<input  name="weixinid" type="text" value="<?=$live_data['weixin_id']?>">
+    *微信 ID:<input  name="weixin_id" type="text" value="<?=$live_data['weixin_id']?>">
     </td>
   </tr>
 </table align="center" width="85%" bgcolor="#f3f3f3">
@@ -630,31 +633,28 @@ function check_form(){
     <td height="40">直播平台:</td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" id="live_check1" value="fb" name="live_check1" <?if($live_data['fb_info'][0]=='fb') echo "checked"?>>FB</td>
+    <!-- <td height="40"><input type="checkbox" id="live_check1" value="fb" name="live_check1" <?if($live_data['fb_info'][0]=='fb') echo "checked"?>>FB</td>
     <td height="40">粉絲數 <input type="text" id="live_fan1" name="live_fan1" value="<?=$live_data['fb_info'][1]?>">人/ 連結:<input type="text" id="live_link1" name="live_link1" value="<?=$live_data['fb_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
      <input type="checkbox" id="live_platform1" name="live_platform1[]" value="mobile" <?if(preg_match("/mobile/",$live_data['fb_info'][3])||preg_match("/mobile/",$live_data['fb_info'][4])) echo "checked"?>>手機
      <input type="checkbox"  name="live_platform1[]" value="web" <?if(preg_match("/web/",$live_data['fb_info'][3])||preg_match("/web/",$live_data['fb_info'][4])) echo "checked"?>>電腦
+    </td> -->
+    <td height="40">FB</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan1" name="live_fan1" value="<?=$live_data['fb_info'][0]?>">人/ 連結:<input type="text" id="live_link1" name="live_link1" size="60" value="<?=$live_data['fb_info'][1]?>">&nbsp;&nbsp;&nbsp;&nbsp;
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="17" id="live_check2" name="live_check2" <?if($live_data['17_info'][0]=='17') echo "checked"?>>17直播</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan2" name="live_fan2" value="<?=$live_data['17_info'][1]?>">人/ 連結:<input type="text" id="live_link2" name="live_link2" value="<?=$live_data['fb_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform2" name="live_platform2[]" value="mobile" <?if(preg_match("/mobile/",$live_data['17_info'][3])||preg_match("/mobile/",$live_data['17_info'][4])) echo "checked"?>>手機
-     <input type="checkbox"  name="live_platform2[]" value="web" <?if(preg_match("/web/",$live_data['17_info'][3])||preg_match("/web/",$live_data['17_info'][4])) echo "checked"?>>電腦
+    <td height="40">17直播</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan2" name="live_fan2" value="<?=$live_data['17_info'][0]?>">人/ 連結:<input type="text" id="live_link2" name="live_link2" size="60" value="<?=$live_data['17_info'][1]?>">&nbsp;&nbsp;&nbsp;&nbsp;
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="up" id="live_check3" name="live_check3" <?if($live_data['up_info'][0]=='up') echo "checked"?>>UP直播</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan3" name="live_fan3" value="<?=$live_data['up_info'][1]?>">人/ 連結:<input type="text" id="live_link3" name="live_link3" value="<?=$live_data['up_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox"  id="live_platform3" name="live_platform3[]" value="mobile" <?if(preg_match("/mobile/",$live_data['up_info'][3])||preg_match("/mobile/",$live_data['up_info'][4])) echo "checked"?>>手機
-     <input type="checkbox"  name="live_platform3[]" value="web" <?if(preg_match("/web/",$live_data['up_info'][3])||preg_match("/web/",$live_data['up_info'][4])) echo "checked"?>>電腦
+   <td height="40">UP直播</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan3" name="live_fan3" value="<?=$live_data['up_info'][0]?>">人/ 連結:<input type="text" id="live_link3" name="live_link3" size="60" value="<?=$live_data['up_info'][1]?>">&nbsp;&nbsp;&nbsp;&nbsp;
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="me" id="live_check4" name="live_check4" <?if($live_data['me_info'][0]=='me') echo "checked"?>>Liveme</td>
-    <td height="40">粉絲數 <input type="text" id="live_fan4" name="live_fan4" value="<?=$live_data['me_info'][1]?>">人/ 連結:<input type="text" id="live_link4" name="live_link4" value="<?$live_data['me_info'][2]?>" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform4" name="live_platform4[]" value="mobile" <?if(preg_match("/mobile/",$live_data['me_info'][3])||preg_match("/mobile/",$live_data['me_info'][4])) echo "checked"?>>手機
-     <input type="checkbox"  name="live_platform4[]" value="web" <?if(preg_match("/web/",$live_data['me_info'][3])||preg_match("/web/",$live_data['me_info'][4])) echo "checked"?>>電腦
+    <td height="40">Liveme</td>
+    <td height="40">粉絲數 <input type="text" id="live_fan4" name="live_fan4" value="<?=$live_data['me_info'][0]?>">人/ 連結:<input type="text" id="live_link4" name="live_link4" size="60" value="<?=$live_data['me_info'][1]?>">&nbsp;&nbsp;&nbsp;&nbsp;
     </td>
   </tr>
 </table>
@@ -695,11 +695,12 @@ function check_form(){
 
 <table  align="center" width="85%" bgcolor="#f3f3f3">
    <tr>
+    <!-- <img src="/images/glyphicons-17-bin.png" onclick="set_content()"> -->
      <td><h4>個人經歷：</h4> <a style="color:red">(注意：字數上限為9000個字元，總容量包含圖檔不可超過 500K ，2個字元等於1個中文字) 
      </a></td>
    </tr>
    <tr>
-     <td><textarea name="experience" id="experience" ></textarea></td>
+     <td><textarea name="experience" id="experience" ><?=$live_data['experience']?></textarea></td>
    </tr>
    <tr>
      <td height="40" align="center"><input type="button" value="送出資料" onclick="check_form();"></td>

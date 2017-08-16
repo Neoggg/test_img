@@ -11,6 +11,10 @@ $sex=0;
 <script language="JavaScript" type="text/JavaScript" src="/css/jquery-3.2.1.min.js"></script>
 <script language="JavaScript" src="/tinymce/tinymce.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
+set_content();
+function set_content(){
+        tinyMCE.get("experience").setContent('Hello World! 這是 TinyMCE!');
+        }
 function showlocation(value) {
   //var loc_e = document.getElementById('else')
   if(value=='else'){
@@ -37,15 +41,21 @@ function manager_change(value) {
 function readimg_multiple(input) {
 
  var file_array= Math.random().toString(36).substring(2,6)
-
  var pre_sum= document.getElementsByClassName('pre_img').length //抓class算長度
  var file_can_use=0
  file_can_use=5-pre_sum
- if(input.files.length>file_can_use){
+ if(input.files.length>file_can_use){ //檢查張數
     alert('最多只能上傳5張照片');
     return false;
-}
-    
+  }
+ 
+  for($i=0;$i<input.files.length;$i++){ //檢查大小
+    if((input.files[$i].size/1024)>1024){
+      alert(input.files[$i].name+" 大於1MB，請重新上傳!")
+      return false;
+    }
+  }
+
 if (input.files && input.files[0]) {
                $("#add_new").remove()
                var filelist = document.getElementById(input.id).files;
@@ -55,11 +65,11 @@ if (input.files && input.files[0]) {
                xhr.open('POST', '/upload.php',true)
               
               for($i=0;$i<filelist.length;$i++){    
-                
+                var file= filelist[$i] 
                 var div_str='<div id="' +"div_"+ file_array+"_"+filelist[$i].name + '" name="' +"div_"+ file_array+"_"+filelist[$i].name + '"  style="padding-right:10px;  display : inline-block; position : relative;"><img id="load"  name="' +"load_"+ file_array+"_"+filelist[$i].name + '" align="center" src="/images/loader06.gif" style=" display: none; position:absolute; top:0; right:10;"></div>'; //先生成預覽圖所需要div
                 $('#preview_img1').append(div_str);
                 
-                var file= filelist[$i]                             
+                                            
                 var reader = new FileReader();
                 var img_div=document.getElementById("preview_img1");
                 reader.readAsDataURL(file);
@@ -328,37 +338,33 @@ function check_form(){
     $platform_num=4
     for($i=1;$i<= $platform_num;$i++){
      var chk_num=String($i);
-     var check1 = document.getElementById("live_check"+chk_num);
+     //var check1 = document.getElementById("live_check"+chk_num);
      var fan = document.getElementById("live_fan"+chk_num);
      var link = document.getElementById("live_link"+chk_num);
      var live_platform=document.getElementsByName("live_platform"+chk_num+"[]");
-     if(check1.checked){  
-        if(fan.value==''){  
+     if(link.value!=''&&fan.value==''){   
           alert("請輸入粉絲人數!");
           document.getElementById("live_fan"+chk_num).focus()
           return false;  
-        }
      }
-     if(check1.checked){  
-        if(link.value==''){  
-          alert("請輸入直播連結!");
-          document.getElementById("live_link"+chk_num).focus()
-          return false;  
-        }
-     }
-     if(check1.checked){  
-        var chk='f';
-        for($j=0;$j<live_platform.length;$j++){
-          if(live_platform[$j].checked==true){
-            chk='t';
-          }
-        }
-        if(chk=='f'){  
-          alert("請選擇直播平台!");
-          document.getElementById("live_platform"+chk_num).focus()
-          return false;  
-        }
-     }
+     // if(fan.value!=''&&link.value==''){   
+     //      alert("請輸入直播連結!");
+     //      document.getElementById("live_link"+chk_num).focus()
+     //      return false;  
+     // }
+     // if(check1.checked){  
+     //    var chk='f';
+     //    for($j=0;$j<live_platform.length;$j++){
+     //      if(live_platform[$j].checked==true){
+     //        chk='t';
+     //      }
+     //    }
+     //    if(chk=='f'){  
+     //      alert("請選擇直播平台!");
+     //      document.getElementById("live_platform"+chk_num).focus()
+     //      return false;  
+     //    }
+     // }
   }
   var img_sum= document.getElementsByClassName('pre_img').length
         if(img_sum==0){  
@@ -475,7 +481,7 @@ function check_form(){
   </tr>
   <tr>
     <td height=40>E-MAIL:<input id="email" name="email" type="email" value="" size="60">&nbsp;&nbsp;&nbsp;&nbsp;
-    *微信 ID:<input  name="weixinid" type="text" value="">
+    *微信 ID:<input  name="weixin_id" type="text" value="">
     </td>
   </tr>
 </table align="center" width="85%" bgcolor="#f3f3f3">
@@ -542,31 +548,31 @@ function check_form(){
     <td height="40">直播平台:</td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" id="live_check1" value="fb" name="live_check1">FB</td>
+    <td height="40"><!-- <input type="checkbox" id="live_check1" value="fb" name="live_check1"> -->FB</td>
     <td height="40">粉絲數 <input type="text" id="live_fan1" name="live_fan1">人/ 連結:<input type="text" id="live_link1" name="live_link1" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform1" name="live_platform1[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform1[]" value="web">電腦
+     <!-- <input type="checkbox" id="live_platform1" name="live_platform1[]" value="mobile">手機
+     <input type="checkbox"  name="live_platform1[]" value="web">電腦 -->
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="17" id="live_check2" name="live_check2">17直播</td>
+    <td height="40"><!-- <input type="checkbox" value="17" id="live_check2" name="live_check2"> -->17直播</td>
     <td height="40">粉絲數 <input type="text" id="live_fan2" name="live_fan2">人/ 連結:<input type="text" id="live_link2" name="live_link2" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform2" name="live_platform2[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform2[]" value="web">電腦
+    <!--  <input type="checkbox" id="live_platform2" name="live_platform2[]" value="mobile">手機
+     <input type="checkbox"  name="live_platform2[]" value="web">電腦 -->
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="up" id="live_check3" name="live_check3">UP直播</td>
+    <td height="40"><!-- <input type="checkbox" value="up" id="live_check3" name="live_check3"> -->UP直播</td>
     <td height="40">粉絲數 <input type="text" id="live_fan3" name="live_fan3">人/ 連結:<input type="text" id="live_link3" name="live_link3" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox"  id="live_platform3" name="live_platform3[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform3[]" value="web">電腦
+     <!-- <input type="checkbox"  id="live_platform3" name="live_platform3[]" value="mobile">手機
+     <input type="checkbox"  name="live_platform3[]" value="web">電腦 -->
     </td>
   </tr>
   <tr>
-    <td height="40"><input type="checkbox" value="me" id="live_check4" name="live_check4">Liveme</td>
+    <td height="40"><!-- <input type="checkbox" value="me" id="live_check4" name="live_check4"> -->Liveme</td>
     <td height="40">粉絲數 <input type="text" id="live_fan4" name="live_fan4">人/ 連結:<input type="text" id="live_link4" name="live_link4" size="60">&nbsp;&nbsp;&nbsp;&nbsp;可觀看平台: 
-     <input type="checkbox" id="live_platform4" name="live_platform4[]" value="mobile">手機
-     <input type="checkbox"  name="live_platform4[]" value="web">電腦
+    <!--  <input type="checkbox" id="live_platform4" name="live_platform4[]" value="mobile">手機
+     <input type="checkbox"  name="live_platform4[]" value="web">電腦 -->
     </td>
   </tr>
 </table>
