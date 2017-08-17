@@ -7,7 +7,7 @@ $result=mysql_query($sql, $liveconn);
 while ($r=mysql_fetch_array($result)) {
   //print_r($r);
       $live_data['status']=$r['status'];
-      $live_data['user_name']=$r['name'];
+      $live_data['name']=$r['name'];
       $live_data['sex']=$r['sex'];
       $live_data['coordination']=$r['coordination'];
       $live_data['location']=$r['location'];
@@ -39,6 +39,11 @@ while ($r=mysql_fetch_array($result)) {
       $live_data['experience']=$r['experience'];
 }
 
+$live_has=0;//計算原有的img數量
+for ($i=1; $i <6 ; $i++) { 
+  if($live_data['img'.$i]!='') $live_has++;
+}
+
 $plaform_array=['fb_info','17_info','up_info','me_info'];
 for ($j=0; $j <4 ; $j++) { 
       if($live_data[$plaform_array[$j]][0]==''){
@@ -67,9 +72,10 @@ else $live_data['manager_text']="";
 <script language="JavaScript" type="text/JavaScript" src="/css/jquery-3.2.1.min.js"></script>
 <script language="JavaScript" src="/tinymce/tinymce.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
-function set_content(){      //觸發tinymce內容設定
-        tinyMCE.get("experience").setContent("<?=$live_data['experience']?>");      
-        }
+
+// function set_content(){      //觸發tinymce內容設定 有含圖片會失敗?只好先註解掉
+//         tinyMCE.get("experience").setContent("<?=$live_data['experience']?>");      
+//         }
 
 function showlocation(value) {
   //var loc_e = document.getElementById('else')
@@ -96,7 +102,6 @@ function manager_change(value) {
 }
 
 function readimg_multiple(input) {
-
  var file_array= Math.random().toString(36).substring(2,6)
 
  var pre_sum= document.getElementsByClassName('pre_img').length //抓class算長度
@@ -106,7 +111,14 @@ function readimg_multiple(input) {
  if(input.files.length>file_can_use){
     alert('最多只能上傳5張照片');
     return false;
-}
+  }
+
+  for($i=0;$i<input.files.length;$i++){ //檢查大小
+    if((input.files[$i].size/1024)>1024){
+      alert(input.files[$i].name+" 大於1MB，請重新上傳!")
+      return false;
+    }
+  }
     
 if (input.files && input.files[0]) {
                $("#add_new").remove()
@@ -253,7 +265,9 @@ $(function () { //顯示經紀人table
                   $("div[name='"+div_name+"']").remove(); //抓div name刪除
                   //$(this).closest("div").remove()//抓最近的div刪除
                   var pre_sum= document.getElementsByClassName('pre_img').length
-                  if(pre_sum<5&& $("#add_new").length==0){
+                  var pre_user_sum= document.getElementsByClassName('pre_img_user').length//edit頁要計算原有的圖片
+                  var edit_img_sum=pre_sum+pre_user_sum
+                  if(edit_img_sum<5&& $("#add_new").length==0){
                     var add_new='<img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" />'
                    $("#preview_img1").append(add_new)
                   }
@@ -463,10 +477,16 @@ function check_form(){
      
      if(tinyMCE.get('experience').getContent()==''){  
          alert("請輸入個人經歷!");
-         document.getElementById("experience").focus()  
+         tinyMCE.get('experience').focus()
          return false;
      }
 
+     if(tinyMCE.get('experience').getContent().length>9000){  
+         alert("個人經歷大於9000字，請重新輸入!");
+         tinyMCE.get('experience').focus()
+         return false;
+     }
+    document.liver_form.action ="/adm/liver_form_check.php";
     document.getElementById("liver_form").submit()
 }
    
@@ -474,7 +494,7 @@ function check_form(){
 </script>
 </head>
 <body id="body">
-<form name="liver_form" id="liver_form" method="POST" action="/adm/liver_form_check.php" enctype="multipart/form-data">
+<form name="liver_form" id="liver_form" method="POST"  enctype="multipart/form-data">
 <input type="hidden" name="img_ay" id="img_ay">
 <input type="hidden" name="img_ay_user" id="img_ay_user">
 <input type="hidden" name="live_no" id="live_no" value="<?=$live_no?>">
@@ -497,7 +517,7 @@ function check_form(){
 
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr >
-  	<td height=40>*真實姓名:<input  name="name" type="text"  id="name" value="<?=$live_data['user_name']?>">
+  	<td height=40>*真實姓名:<input  name="name" type="text"  id="name" value="<?=$live_data['name']?>">
   	   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   	    *性別:
   	    <input type="radio" id="sex" name="sex" value="1" <? if ($live_data['sex']==1) echo "checked"; ?>>男
@@ -668,7 +688,7 @@ function check_form(){
    <tr >
      <td>
        
-        <input type="file" name="img_file[]" id="img_file" size="20" onchange="readimg_multiple(this);" style="display: none;" accept="image/jpeg,image/gif,image/png" multiple>
+        <input type="file" name="img_file[]" id="img_file" size="20" onchange="readimg_multiple(this);console.log(this.value);" style="display: none;" accept="image/jpeg,image/gif,image/png" multiple>
         <div id="preview_img1" ><?
         for ($i=1; $i <=5 ; $i++) { 
             if($live_data['img'.$i]!=''){
@@ -678,7 +698,7 @@ function check_form(){
             }
         }
         ?>
-        <img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" /></div> <!-- 預覽圖片位置 -->
+        <?if($live_has<5){?><img  id="add_new" src="/images/add_new.png"  width="200" height="150" onclick="img_file.click()" style="" /><?}?></div> <!-- 預覽圖片位置 -->
     <div id="searchResult"></div>
      </td>
    </tr>
@@ -689,7 +709,7 @@ function check_form(){
      <td><h4>特色說明：(字數限制30字)</h4></td>
    </tr>
    <tr>
-     <td ><input type="text" id="special_direct" name="special_direct" size="140" value="<?=$live_data['special_direct']?>"></td>
+     <td ><input type="text" id="special_direct" name="special_direct" size="120" value="<?=$live_data['special_direct']?>"></td>
    </tr>
 </table>
 

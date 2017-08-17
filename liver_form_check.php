@@ -1,8 +1,7 @@
 <?php
 $liveconn = mysql_connect('10.50.21.12','achleader','ach1234');
 print_r($_POST);
-echo "<br>";
-
+echo "check"."<br>";
 $time=date("Y-m-d H:i:s");
 //----------------------直播達人 資料設定--------------------------------------------------------
 $live_data=array();
@@ -72,7 +71,7 @@ $live_data['special_direct']=$_POST['special_direct'];
 $live_data['experience']=$_POST['experience'];
 //$liver_no='1111';
 $no_class="liver_no";
-if($_POST['live_no']!='') $liver_no=$_POST['live_no'];
+if(isset($_POST['live_no'])&&$_POST['live_no']!='') $liver_no=$_POST['live_no'];
 else $liver_no=get_num($no_class);
 
 if(!$liver_no){

@@ -11,10 +11,7 @@ $sex=0;
 <script language="JavaScript" type="text/JavaScript" src="/css/jquery-3.2.1.min.js"></script>
 <script language="JavaScript" src="/tinymce/tinymce.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
-set_content();
-function set_content(){
-        tinyMCE.get("experience").setContent('Hello World! 這是 TinyMCE!');
-        }
+
 function showlocation(value) {
   //var loc_e = document.getElementById('else')
   if(value=='else'){
@@ -191,7 +188,8 @@ $(function () { //顯示經紀人table
 });
 
 
-function check_form(){
+function check_form(input){
+
     var all_form=document.forms['liver_form'];
     var pre_img= document.getElementsByClassName('pre_img')
     var img_array = document.getElementById('img_ay');
@@ -380,18 +378,34 @@ function check_form(){
      
      if(tinyMCE.get('experience').getContent()==''){  
          alert("請輸入個人經歷!");
-         document.getElementById("experience").focus()  
+         tinyMCE.get('experience').focus() 
          return false;
      }
+ 
+    var form =document.getElementById("liver_form");
 
-    document.getElementById("liver_form").submit()
+    if(input.id=="pre_form"){ 
+        var action ="/adm/liver_form_pre.php";
+        form.action=action;
+        form.target = 'form-target';//target 跟windowopen設一樣即可符合裡面設定
+        document.body.appendChild(form);
+        window.open('', 'form-target', 'width=1024, height=950');
+        form.submit();
+    }
+    else{
+        var action ="/adm/liver_form_check.php";
+        form.action=action;
+        form.submit();
+    }
+    
+    
 }
    
 
 </script>
 </head>
 <body>
-<form name="liver_form" id="liver_form" method="POST" action="/adm/liver_form_check.php" enctype="multipart/form-data">
+<form name="liver_form" id="liver_form" method="POST"  enctype="multipart/form-data"><!-- action="/adm/liver_form_check.php" -->
 <input type="hidden" name="img_ay" id="img_ay">
 <table align="center" width="85%" bgcolor="#f3f3f3">
   <tr>
@@ -598,7 +612,7 @@ function check_form(){
      <td><h4>特色說明：(字數限制30字)</h4></td>
    </tr>
    <tr>
-     <td ><input type="text" id="special_direct" name="special_direct" size="140"></td>
+     <td ><input type="text" id="special_direct" name="special_direct" size="120"></td>
    </tr>
 </table>
 
@@ -611,7 +625,10 @@ function check_form(){
      <td><textarea name="experience" id="experience" ></textarea></td>
    </tr>
    <tr>
-     <td height="40" align="center"><input type="button" value="送出資料" onclick="check_form();"></td>
+   <td height="40" align="center">
+     <input type="button" id="pre_form" value="預覽" onclick="check_form(this);">
+     <input type="button" value="送出" onclick="check_form(this);">
+     </td>
    </tr>
 </table>
 </form>
